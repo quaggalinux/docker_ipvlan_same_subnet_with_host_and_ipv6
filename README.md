@@ -44,19 +44,21 @@ inet6 2a01:53c0:ff0e:2e:20c:29ff:feff:1453/64 scope global dynamic mngtmpaddr no
 检查创建是否成功  
 #docker network ls  
   
-创建两个容器实例并使用ipvlan模式，指定ipv6地址，指定IPv4地址，如果不指定的话会自动分配，  
-建议自己指定，可避免IPv4地址冲突问题，验证指定的ipv4地址是否能够与宿主机ipv4通信  
+创建两个容器实例并使用ipvlan模式，创建后肯定能够与非宿主机的同局域网机器互通，  
+指定ipv6地址，指定IPv4地址，如果不指定的话会自动分配，  
+建议自己指定，可避免IPv4地址冲突问题 
   
 #docker run -dit --restart=always --network=ip6ipvlan --ip6=2a01:53c0:ff0e:2e:4::2 --ip=10.0.0.202 --name=u18ip6ipvlan2 -v /data:/data ubuntu:bionic-20210827 /bin/bash -c "/etc/init.d/cron start;/etc/init.d/run;/bin/bash"  
   
 #docker run -dit --restart=always --network=ip6ipvlan --ip6=2a01:53c0:ff0e:2e:4::3 --ip=10.0.0.203 --name=u18ip6ipvlan3 -v /data:/data ubuntu:bionic-20210827 /bin/bash -c "/etc/init.d/cron start;/etc/init.d/run;/bin/bash"  
   
-无论如何宿主机的原生ipv4是不能直接和本机新创建的容器通信的，所以另外创建一个ipvlan并把它设置成桥接组，  
+以下配置目的是实现与宿主机通信，因为无论如何宿主机的原生ipv4是不能直接和本机新创建的容器通信的，  
+所以另外创建一个ipvlan并把它设置成桥接组，  
   
 #ip link add ipvlan0 link ens33 type ipvlan mode l2  
   
-在ipvlan模式下必须设置这个接口ip地址，否则不能转发ip包，而且这个地址要与宿主机原来ip地址不同，  
-以作为访问宿主机的ip地址，配置完成后容器实例仍然不能访问宿主机原来的ip地址，只能访问这个宿主机新加的ip地址  
+在ipvlan模式下必须设置这个接口ip地址，而且这个地址要与宿主机原来ip地址不同，以作为访问宿主机的ip地址，  
+配置完成后容器实例仍然不能访问宿主机原来的ip地址，只能访问这个宿主机新加的ip地址  
 #ip address add 10.0.0.207/24 dev ipvlan0  
   
 #ip link set ipvlan0 up  
