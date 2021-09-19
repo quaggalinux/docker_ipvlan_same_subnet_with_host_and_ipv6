@@ -52,8 +52,7 @@ inet6 2a01:53c0:ff0e:2e:20c:29ff:feff:1453/64 scope global dynamic mngtmpaddr no
 #docker run -dit --restart=always --network=ip6ipvlan --ip6=2a01:53c0:ff0e:2e:4::3 --ip=10.0.0.203 --name=u18ip6ipvlan3 -v /data:/data ubuntu:bionic-20210827 /bin/bash -c "/etc/init.d/cron start;/etc/init.d/run;/bin/bash"  
   
 无论如何宿主机的原生ipv4是不能直接和本机新创建的容器通信的，所以另外创建一个ipvlan并把它设置成桥接组，  
-如果各位没有宿主机与本机容器互通需求，那么可以忽略下面的配置了，  
-因为这时容器已经可以和任何局域网内10.0.0.0/24网段的机器互通，除了宿主机  
+  
 #ip link add ipvlan0 link ens33 type ipvlan mode l2  
   
 在ipvlan模式下必须设置这个接口ip地址，否则不能转发ip包，而且这个地址要与宿主机原来ip地址不同，  
